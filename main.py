@@ -23,8 +23,8 @@ def main():
     dataMap = getData()
     crnInput = dataMap["crn"]
 
-    # Initialize boolean (PhantomJS does not need Alert(driver))
-    isPhantom = False
+    # Initialize boolean
+    isPhantom = False # (PhantomJS does not need Alert(driver))
 
     # Initialize Webdriver.
     if (len(sys.argv) > 1):
@@ -42,7 +42,7 @@ def main():
         driver = webdriver.PhantomJS()
 
     # Make the window relatively small so it doesn't cover the screen.
-    driver.set_window_size(480, 480)
+    driver.set_window_size(600, 480)
 
     # Navigate to BannerWeb.
     driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin")
@@ -140,7 +140,7 @@ def getCRNFields(driver, crnInput):
         Gets the CRN text box.
 
         Arguments:
-            :type driver :    webdriver.PhantomJS()
+            :type driver :    webdriver
                 Selenium PhantomJS drier.
             :type crnInput :  list
                 List of CRN numbers.
