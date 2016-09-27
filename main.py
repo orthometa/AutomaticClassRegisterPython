@@ -32,14 +32,14 @@ def main():
             driver = webdriver.Firefox()
         elif (sys.argv[1].lower() == "phantom"):
             isPhantom = True
-            driver = webdriver.PhantomJS()
+            driver = webdriver.PhantomJS("./phantomjs.exe")
         else:
             print("Invalid option...using PhantomJS")
             isPhantom = True
-            driver = webdriver.PhantomJS()
+            driver = webdriver.PhantomJS("./phantomjs.exe")
     else:
         isPhantom = True
-        driver = webdriver.PhantomJS()
+        driver = webdriver.PhantomJS("./phantomjs.exe")
 
     # Make the window relatively small so it doesn't cover the screen.
     driver.set_window_size(600, 480)
