@@ -1,0 +1,6 @@
+__init__.py
+*.jpg
+*.log
+img/
+logs/
+myData.txt
