@@ -58,9 +58,6 @@ def main():
     else:
         driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
 
-    # Make the window relatively small so it doesn't cover the screen.
-    driver.set_window_size(600, 480)
-
     # Navigate to BannerWeb.
     driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin")
 
