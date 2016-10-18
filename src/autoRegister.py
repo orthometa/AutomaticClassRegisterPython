@@ -16,9 +16,9 @@ from selenium import webdriver
 from selenium.webdriver.common.alert import Alert
 from selenium.common.exceptions import NoSuchElementException
 import datetime
-import time
-import sys
 import os
+import sys
+import time
 
 def main():
     # Ensure a data file path is given.
@@ -38,12 +38,14 @@ def main():
 
     # Initialize boolean
     isFirefox = False # (Firefox has Alert(driver))
+    isPhantom = False
 
     # Initialize Webdriver.
     if (len(sys.argv) > 2):
         if (sys.argv[2].lower() == "chrome"):
             driver = webdriver.Chrome("../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
         elif (sys.argv[2].lower() == "phantom"):
+            isPhantom = True
             driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
         elif (sys.argv[2].lower() == "firefox"):
             # Based on MDN. Import when only required to.
@@ -54,8 +56,10 @@ def main():
             driver = webdriver.Firefox(executable_path="../drivers/geckodriver.exe",capabilities=caps)
         else:
             print("Invalid option...using PhantomJS")
+            isPhantom = True
             driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
     else:
+        isPhantom = True
         driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
 
     # Navigate to BannerWeb.
@@ -113,7 +117,16 @@ def main():
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
-    driver.close()
+    # driver.close()
+    if (isPhantom):
+        driver.close()
+    else:
+        try:
+            while(True):
+                print("Waiting For User to terminate (Ctrl-C)")
+        except(KeyboardInterrupt):
+            print("Terminating")
+            driver.close()
 
 def getData(dataFile):
     """
@@ -168,10 +181,11 @@ def getCRNFields(driver, crnInput):
         Raises Selenium.NoSuchElementException
     """
     crnFields = []
+    identifier = 1
 
     while(len(crnFields) < len(crnInput)):
-        for k in range(len(crnInput)):
-            crnFields.append(driver.find_element_by_id("crn_id" + str(k + 1)))
+        crnFields.append(driver.find_element_by_id("crn_id" + str(identifier)))
+        identifier += 1
 
     return crnFields
 
