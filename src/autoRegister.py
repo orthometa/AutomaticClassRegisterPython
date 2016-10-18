@@ -90,8 +90,9 @@ def main():
             print(currentTime)
             continue
 
+        # Enter CRN info.
         try:
-            crnFields = getCRNFields(driver, crnInput)
+            crnFields = fillInCrn(driver, crnInput)
             break
         except(NoSuchElementException):
             print("Page Not Ready.")
@@ -102,13 +103,6 @@ def main():
     # Get potential submit buttons.
     regButtons = driver.find_elements_by_name("REG_BTN")
 
-    # Enter CRN numbers.
-    crnIndex = 0
-    for element in crnFields:
-        if (element.get_attribute("type") == "text" and element.get_attribute("name") == "CRN_IN"):
-            element.send_keys(crnInput[crnIndex])
-            crnIndex += 1
-
     # Submit Changes
     for element in regButtons:
         if (element.get_attribute("value") == "Submit Changes"):
@@ -117,16 +111,12 @@ def main():
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
-    # driver.close()
     if (isPhantom):
         driver.close()
     else:
-        try:
-            while(True):
-                print("Waiting For User to terminate (Ctrl-C)")
-        except(KeyboardInterrupt):
-            print("Terminating")
-            driver.close()
+        print("Waiting For User to terminate (Ctrl-C)")
+        while(True):
+            pass
 
 def getData(dataFile):
     """
@@ -167,9 +157,9 @@ def clickTagWithValue(driver, tagName, value):
             element.click()
             break
 
-def getCRNFields(driver, crnInput):
+def fillInCrn(driver, crnInput):
     """
-        Gets the CRN text box.
+        Gets the CRN text box and fills it in with crn numbers.
 
         Arguments:
             :type driver :    webdriver
@@ -183,8 +173,10 @@ def getCRNFields(driver, crnInput):
     crnFields = []
     identifier = 1
 
-    while(len(crnFields) < len(crnInput)):
-        crnFields.append(driver.find_element_by_id("crn_id" + str(identifier)))
+    # xpath variant.
+    #   driver.find_element_by_xpath("/html/body/div[3]/form/table[3]/tbody/tr[2]/td[1]/input[@id='crn_id1']").send_keys("hello")
+    while (len(crnFields) < len(crnInput)):
+        crnFields.append(driver.find_element_by_id("crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
         identifier += 1
 
     return crnFields
