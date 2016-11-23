@@ -23,7 +23,7 @@ import time
 def main():
     # Ensure a data file path is given.
     if (len(sys.argv) < 2):
-        print("main.py <dataFile> <opt:browser>")
+        print("AutoRegister.py <dataFile> <opt:browser>")
         return
 
     # Make directory for logs and images if necessary.
