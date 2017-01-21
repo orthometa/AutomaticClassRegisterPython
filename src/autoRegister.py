@@ -20,47 +20,60 @@ import os
 import sys
 import time
 
-def main():
-    # Ensure a data file path is given.
-    if (len(sys.argv) < 2):
-        print("AutoRegister.py <dataFile> <opt:browser>")
-        return
 
+def setup_directory():
+    """
+        Creates the logs and img files if not created.
+    """
     # Make directory for logs and images if necessary.
     if (not os.path.isdir("../logs/")):
         os.makedirs("../logs/")
     if (not os.path.isdir("../img/")):
         os.makedirs("../img/")
 
+
+def main():
+    # Ensure a data file path is given.
+    if (len(sys.argv) < 2):
+        print("AutoRegister.py <dataFile> <opt:browser>")
+        return
+
+    setup_directory()
+
     # Initialize Data.
     dataMap = getData(sys.argv[1])
     crnInput = dataMap["crn"]
 
     # Initialize boolean
-    isFirefox = False # (Firefox has Alert(driver))
+    isFirefox = False  # (Firefox has Alert(driver))
     isPhantom = False
 
     # Initialize Webdriver.
     if (len(sys.argv) > 2):
         if (sys.argv[2].lower() == "chrome"):
-            driver = webdriver.Chrome("../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
+            driver = webdriver.Chrome(
+                "../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
         elif (sys.argv[2].lower() == "phantom"):
             isPhantom = True
-            driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+            driver = webdriver.PhantomJS(
+                "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
         elif (sys.argv[2].lower() == "firefox"):
             # Based on MDN. Import when only required to.
             isFirefox = True
             from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
             caps = DesiredCapabilities.FIREFOX
             caps["marionette"] = True
-            driver = webdriver.Firefox(executable_path="../drivers/geckodriver.exe",capabilities=caps)
+            driver = webdriver.Firefox(
+                executable_path="../drivers/geckodriver.exe", capabilities=caps)
         else:
             print("Invalid option...using PhantomJS")
             isPhantom = True
-            driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+            driver = webdriver.PhantomJS(
+                "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
     else:
         isPhantom = True
-        driver = webdriver.PhantomJS("../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+        driver = webdriver.PhantomJS(
+            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
 
     # Navigate to BannerWeb.
     driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin")
@@ -118,6 +131,7 @@ def main():
         while(True):
             pass
 
+
 def getData(dataFile):
     """
         Pulls user data from data.txt.
@@ -134,6 +148,7 @@ def getData(dataFile):
     dataFile.close()
 
     return dataMap
+
 
 def clickTagWithValue(driver, tagName, value):
     """
@@ -157,6 +172,7 @@ def clickTagWithValue(driver, tagName, value):
             element.click()
             break
 
+
 def fillInCrn(driver, crnInput):
     """
         Gets the CRN text box and fills it in with crn numbers.
@@ -176,7 +192,8 @@ def fillInCrn(driver, crnInput):
     # xpath variant.
     #   driver.find_element_by_xpath("/html/body/div[3]/form/table[3]/tbody/tr[2]/td[1]/input[@id='crn_id1']").send_keys("hello")
     while (len(crnFields) < len(crnInput)):
-        crnFields.append(driver.find_element_by_id("crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
+        crnFields.append(driver.find_element_by_id(
+            "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
         identifier += 1
 
     return crnFields
