@@ -42,32 +42,9 @@ def main():
 
     # Initialize Data.
     dataMap = getData(sys.argv[1])
-    crnInput = dataMap["crn"]
-
-    # Initialize boolean
 
     # Initialize Webdriver.
-    if (len(sys.argv) > 2):
-        if (sys.argv[2].lower() == "chrome"):
-            driver = webdriver.Chrome(
-                "../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
-        elif (sys.argv[2].lower() == "phantom"):
-            driver = webdriver.PhantomJS(
-                "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
-        elif (sys.argv[2].lower() == "firefox"):
-            # Based on MDN. Import when only required to. (Firefox has Alert(driver))
-            from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-            caps = DesiredCapabilities.FIREFOX
-            caps["marionette"] = True
-            driver = webdriver.Firefox(
-                executable_path="../drivers/geckodriver.exe", capabilities=caps)
-        else:
-            print("Invalid option...using PhantomJS")
-            driver = webdriver.PhantomJS(
-                "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
-    else:
-        driver = webdriver.PhantomJS(
-            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+    driver = getDriver(sys.argv[2].lower())
 
     # Navigate to BannerWeb.
     driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin")
@@ -99,7 +76,7 @@ def main():
 
         # Enter CRN info.
         try:
-            crnFields = fillInCrn(driver, crnInput)
+            crnFields = fillInCrn(driver, dataMap["crn"])
         except(NoSuchElementException):
             print("Page Not Ready.")
             driver.refresh()
@@ -124,6 +101,24 @@ def main():
         while(True):
             pass
 
+def getDriver(browser):
+    if (browser == "chrome"):
+        return webdriver.Chrome(
+            "../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
+    elif (browser == "phantom"):
+        return webdriver.PhantomJS(
+            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+    elif (browser == "firefox"):
+        # Based on MDN. Import when only required to. (Firefox has Alert(driver))
+        from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+        caps = DesiredCapabilities.FIREFOX
+        caps["marionette"] = True
+        return webdriver.Firefox(
+            executable_path="../drivers/geckodriver.exe", capabilities=caps)
+    else:
+        print("Invalid option...using PhantomJS")
+        return webdriver.PhantomJS(
+            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
 
 def getData(dataFile):
     """
