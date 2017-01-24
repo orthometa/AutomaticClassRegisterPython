@@ -66,16 +66,10 @@ def main():
             print(currentTime)
             continue
 
-        # Enter CRN info.
-        try:
-            fillInCrn(driver, dataMap["crn"])
+        # Enter CRN info and registerate
+        if fillInCrn(driver, dataMap["crn"]):
             clickTagWithValue(driver, "input", "Submit Changes")
-            break
-        except(NoSuchElementException):
-            print("Page Not Ready.")
-            driver.refresh()
-            if (isinstance(driver, webdriver.Firefox)):
-                Alert(driver).accept()
+            break;
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
@@ -179,14 +173,18 @@ def fillInCrn(driver, crnInput):
     crnFields = []
     identifier = 1
 
-    # xpath variant.
-    #   driver.find_element_by_xpath("/html/body/div[3]/form/table[3]/tbody/tr[2]/td[1]/input[@id='crn_id1']").send_keys("hello")
-    while (len(crnFields) < len(crnInput)):
-        crnFields.append(driver.find_element_by_id(
-            "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
-        identifier += 1
-
-    return crnFields
+    try:
+        while (len(crnFields) < len(crnInput)):
+            crnFields.append(driver.find_element_by_id(
+                "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
+            identifier += 1
+        return True
+    except(NoSuchElementException):
+        print("Page Not Ready.")
+        driver.refresh()
+        if (isinstance(driver, webdriver.Firefox)):
+            Alert(driver).accept()
+    return False
 
 if __name__ == "__main__":
     main()
