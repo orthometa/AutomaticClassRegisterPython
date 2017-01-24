@@ -10,6 +10,7 @@ Supported drivers:
 Created on Jan 28, 2016
 
 @author: David Lam
+@edited: Fred Zhang
 """
 
 from selenium import webdriver
@@ -21,7 +22,10 @@ import sys
 import time
 
 BANNER_WEB_URL = "https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin"
-
+dataMapUserName_Key = "username"
+dataMapPassword_Key = "password"
+dataMapPin_Key = "pin"
+dataMapCRN_Key = "crn"
 
 def setup_directory():
     """
@@ -45,10 +49,9 @@ def main():
     dataMap = getData(sys.argv[1])
     # Initialize Webdriver.
     driver = getDriver(sys.argv[2].lower())
-    # login into banner
-    login(driver, dataMap["username"], dataMap["password"])
-    # navigate to registeration page
-    enterRegisterationPage(driver, dataMap["pin"])
+    # login into banner and navigate to registeration page
+    login(driver, dataMap[dataMapUserName_Key], dataMap[dataMapPassword_Key])
+    enterRegisterationPage(driver, dataMap[dataMapPin_Key])
 
     # Take picture of the waiting page
     driver.save_screenshot("../img/waitPage.jpg")
@@ -63,13 +66,13 @@ def main():
         break
 
     # attempt to registerate
-    if not attemptToRegisterate(driver, dataMap["crn"]):
-        login(driver, dataMap["username"], dataMap["password"])
-        enterRegisterationPage(driver, dataMap["pin"])
-        # active waiting
+    if not attemptToRegisterate(driver, dataMap[dataMapCRN_Key]):
+        login(driver, dataMap[dataMapUserName_Key], dataMap[dataMapPassword_Key])
+        enterRegisterationPage(driver, dataMap[dataMapPin_Key])
+        # active trying
         while True:
             # Enter CRN info and registerate
-            if attemptToRegisterate(driver, dataMap["crn"]):
+            if attemptToRegisterate(driver, dataMap[dataMapCRN_Key]):
                 break;
 
     # Take picture and close driver.
@@ -189,6 +192,7 @@ def attemptToRegisterate(driver, crnInput):
         if (isinstance(driver, webdriver.Firefox)):
             Alert(driver).accept()
     return False
+
 
 if __name__ == "__main__":
     main()
