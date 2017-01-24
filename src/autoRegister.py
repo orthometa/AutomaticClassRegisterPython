@@ -20,6 +20,8 @@ import os
 import sys
 import time
 
+BANNER_WEB_URL = "https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin"
+
 
 def setup_directory():
     """
@@ -46,19 +48,9 @@ def main():
     # Initialize Webdriver.
     driver = getDriver(sys.argv[2].lower())
 
-    # Navigate to BannerWeb.
-    driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/twbkwbis.P_WWWLogin")
+    login(driver, dataMap["username"], dataMap["password"])
 
-    # Login to Bannerweb.
-    driver.find_element_by_name("sid").send_keys(dataMap["username"])
-    driver.find_element_by_name("PIN").send_keys(dataMap["password"])
-    clickTagWithValue(driver, "input", "Login")
-
-    # Navigate to Registeration page and enter PIN.
-    driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/bwskfreg.P_AltPin")
-    clickTagWithValue(driver, "input", "Submit")
-    driver.find_element_by_name("pin").send_keys(dataMap["pin"])
-    clickTagWithValue(driver, "input", "Submit")
+    enterRegisterationPage(driver, dataMap["pin"])
 
     # Refresh page until crnFields are found.
     firstTimeWaiting = True
@@ -100,6 +92,23 @@ def main():
         print("Waiting For User to terminate (Ctrl-C)")
         while(True):
             pass
+
+def login(driver, userName, password):
+    # Navigate to BannerWeb.
+    driver.get(BANNER_WEB_URL)
+
+    # Login to Bannerweb.
+    driver.find_element_by_name("sid").send_keys(userName)
+    driver.find_element_by_name("PIN").send_keys(password)
+    clickTagWithValue(driver, "input", "Login")
+
+
+def enterRegisterationPage(driver, pin):
+    # Navigate to Registeration page and enter PIN.
+    driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/bwskfreg.P_AltPin")
+    clickTagWithValue(driver, "input", "Submit")
+    driver.find_element_by_name("pin").send_keys(pin)
+    clickTagWithValue(driver, "input", "Submit")
 
 def getDriver(browser):
     if (browser == "chrome"):
