@@ -39,40 +39,43 @@ def main():
     if (len(sys.argv) < 2):
         print("AutoRegister.py <dataFile> <opt:browser>")
         return
-
     setup_directory()
 
     # Initialize Data.
     dataMap = getData(sys.argv[1])
-
     # Initialize Webdriver.
     driver = getDriver(sys.argv[2].lower())
-
+    # login into banner
     login(driver, dataMap["username"], dataMap["password"])
-
+    # navigate to registeration page
     enterRegisterationPage(driver, dataMap["pin"])
 
-    # Refresh page until crnFields are found.
-    firstTimeWaiting = True
-    while (True):
-        # Screenshot the first time it reaches this loop.
-        if (firstTimeWaiting):
-            driver.save_screenshot("../img/waitPage.jpg")
-            firstTimeWaiting = False
+    # Take picture of the waiting page
+    driver.save_screenshot("../img/waitPage.jpg")
 
+    # Refresh page until crnFields are found.
+    while True:
         # Prevent refreshing until two minutes before opening time
         currentTime = datetime.datetime.now()
         if (currentTime.hour < 7 and currentTime.minute < 28):
             print(currentTime)
             continue
+        break
 
-        # Enter CRN info and registerate
-        if fillInCrn(driver, dataMap["crn"]):
-            clickTagWithValue(driver, "input", "Submit Changes")
-            break;
+    # attempt to registerate
+    if not attemptToRegisterate(driver, dataMap["crn"]):
+        login(driver, dataMap["username"], dataMap["password"])
+        enterRegisterationPage(driver, dataMap["pin"])
+        # active waiting
+        while True:
+            # Enter CRN info and registerate
+            if attemptToRegisterate(driver, dataMap["crn"]):
+                break;
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
+
+    # quiting the program
     if (isinstance(driver, webdriver.PhantomJS)):
         driver.close()
     else:
@@ -157,7 +160,7 @@ def clickTagWithValue(driver, tagName, value):
             break
 
 
-def fillInCrn(driver, crnInput):
+def attemptToRegisterate(driver, crnInput):
     """
         Gets the CRN text box and fills it in with crn numbers.
 
@@ -178,6 +181,7 @@ def fillInCrn(driver, crnInput):
             crnFields.append(driver.find_element_by_id(
                 "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
             identifier += 1
+        clickTagWithValue(driver, "input", "Submit Changes")
         return True
     except(NoSuchElementException):
         print("Page Not Ready.")
