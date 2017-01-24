@@ -68,22 +68,14 @@ def main():
 
         # Enter CRN info.
         try:
-            crnFields = fillInCrn(driver, dataMap["crn"])
+            fillInCrn(driver, dataMap["crn"])
+            clickTagWithValue(driver, "input", "Submit Changes")
             break
         except(NoSuchElementException):
             print("Page Not Ready.")
             driver.refresh()
             if (isinstance(driver, webdriver.Firefox)):
                 Alert(driver).accept()
-
-    # Get potential submit buttons.
-    regButtons = driver.find_elements_by_name("REG_BTN")
-
-    # Submit Changes
-    for element in regButtons:
-        if (element.get_attribute("value") == "Submit Changes"):
-            element.click()
-            break
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
