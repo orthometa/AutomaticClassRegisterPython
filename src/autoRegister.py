@@ -16,7 +16,7 @@ Created on Jan 28, 2016
 from selenium import webdriver
 from selenium.webdriver.common.alert import Alert
 from selenium.common.exceptions import NoSuchElementException
-import datetime
+from datetime import datetime
 import os
 import sys
 import time
@@ -26,6 +26,7 @@ dataMapUserName_Key = "username"
 dataMapPassword_Key = "password"
 dataMapPin_Key = "pin"
 dataMapCRN_Key = "crn"
+attempt_time_key = "attempt_start"
 
 def main():
     # Ensure a data file path is given.
@@ -45,11 +46,13 @@ def main():
     # Take picture of the waiting page
     driver.save_screenshot("../img/waitPage.jpg")
 
+    startTime = datetime.strptime(dataMap[attempt_time_key][0], "%H:%M:%S-%m/%d/%Y")
+
     # Refresh page until crnFields are found.
     while True:
         # Prevent refreshing until two minutes before opening time
-        currentTime = datetime.datetime.now()
-        if (currentTime.hour < 7 and currentTime.minute < 28):
+        currentTime = datetime.now()
+        if currentTime < startTime:
             print(currentTime)
             continue
         break
@@ -75,6 +78,7 @@ def main():
         while(True):
             pass
 
+
 def getDriver(browser):
     if (browser == "chrome"):
         return webdriver.Chrome(
@@ -93,6 +97,7 @@ def getDriver(browser):
         print("Invalid option...using PhantomJS")
         return webdriver.PhantomJS(
             "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+
 
 def login(driver, userName, password):
     # Navigate to BannerWeb.
@@ -125,23 +130,22 @@ def attemptToRegisterate(driver, crnInput):
         Returns a list of CRN text box.
         Raises Selenium.NoSuchElementException
     """
-    crnFields = []
-    identifier = 1
-
     try:
-        while (len(crnFields) < len(crnInput)):
-            crnFields.append(driver.find_element_by_id(
-                "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
+        for identifier in range(1, len(crnInput)+1):
+            id = "crn_id" + str(identifier)
+            print(id)
+            element = driver.find_element_by_id(id)
+            element.send_keys(crnInput[identifier - 1])
             identifier += 1
         clickTagWithValue(driver, "input", "Submit Changes")
-        return True
     except(NoSuchElementException):
         print("Page Not Ready.")
         driver.refresh()
         if (isinstance(driver, webdriver.Firefox)):
             Alert(driver).accept()
-    return False
-
+        return False
+    driver.find_element_by_id("crn_id1")
+    return True
 
 def getData(dataFile):
     """
