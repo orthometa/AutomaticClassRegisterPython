@@ -62,13 +62,14 @@ def main():
 
         # Prevent refreshing until two minutes before opening time
         currentTime = datetime.datetime.now()
-        if (currentTime.hour < 7 or currentTime.minute < 28):
+        if (currentTime.hour < 7 and currentTime.minute < 28):
             print(currentTime)
             continue
 
         # Enter CRN info.
         try:
             crnFields = fillInCrn(driver, dataMap["crn"])
+            break
         except(NoSuchElementException):
             print("Page Not Ready.")
             driver.refresh()
