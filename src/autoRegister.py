@@ -39,6 +39,24 @@ def main():
     dataMap = getData(sys.argv[1])
     # Initialize Webdriver.
     driver = getDriver(sys.argv[2].lower())
+
+    # try to auto registerate, retry if there is an exception
+    while True:
+        try:
+            AutoRegister(driver, dataMap)
+            break
+        except NoSuchElementException:
+            pass
+
+    # quiting the program
+    if (isinstance(driver, webdriver.PhantomJS)):
+        driver.close()
+    else:
+        print("Waiting For User to terminate (Ctrl-C)")
+        while(True):
+            pass
+
+def AutoRegister(driver, dataMap):
     # login into banner and navigate to registeration page
     login(driver, dataMap[dataMapUserName_Key], dataMap[dataMapPassword_Key])
     enterRegisterationPage(driver, dataMap[dataMapPin_Key])
@@ -69,15 +87,7 @@ def main():
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
-
-    # quiting the program
-    if (isinstance(driver, webdriver.PhantomJS)):
-        driver.close()
-    else:
-        print("Waiting For User to terminate (Ctrl-C)")
-        while(True):
-            pass
-
+    return True
 
 def getDriver(browser):
     if (browser == "chrome"):
