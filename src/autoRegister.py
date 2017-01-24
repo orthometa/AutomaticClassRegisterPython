@@ -45,7 +45,8 @@ def main():
         try:
             AutoRegister(driver, dataMap)
             break
-        except NoSuchElementException:
+        except NoSuchElementException as e:
+            print("NoSuchElementException happened :" + str(e))
             pass
 
     # quiting the program
