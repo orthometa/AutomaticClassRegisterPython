@@ -27,17 +27,6 @@ dataMapPassword_Key = "password"
 dataMapPin_Key = "pin"
 dataMapCRN_Key = "crn"
 
-def setup_directory():
-    """
-        Creates the logs and img files if not created.
-    """
-    # Make directory for logs and images if necessary.
-    if (not os.path.isdir("../logs/")):
-        os.makedirs("../logs/")
-    if (not os.path.isdir("../img/")):
-        os.makedirs("../img/")
-
-
 def main():
     # Ensure a data file path is given.
     if (len(sys.argv) < 2):
@@ -86,23 +75,6 @@ def main():
         while(True):
             pass
 
-def login(driver, userName, password):
-    # Navigate to BannerWeb.
-    driver.get(BANNER_WEB_URL)
-
-    # Login to Bannerweb.
-    driver.find_element_by_name("sid").send_keys(userName)
-    driver.find_element_by_name("PIN").send_keys(password)
-    clickTagWithValue(driver, "input", "Login")
-
-
-def enterRegisterationPage(driver, pin):
-    # Navigate to Registeration page and enter PIN.
-    driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/bwskfreg.P_AltPin")
-    clickTagWithValue(driver, "input", "Submit")
-    driver.find_element_by_name("pin").send_keys(pin)
-    clickTagWithValue(driver, "input", "Submit")
-
 def getDriver(browser):
     if (browser == "chrome"):
         return webdriver.Chrome(
@@ -121,6 +93,55 @@ def getDriver(browser):
         print("Invalid option...using PhantomJS")
         return webdriver.PhantomJS(
             "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+
+def login(driver, userName, password):
+    # Navigate to BannerWeb.
+    driver.get(BANNER_WEB_URL)
+
+    # Login to Bannerweb.
+    driver.find_element_by_name("sid").send_keys(userName)
+    driver.find_element_by_name("PIN").send_keys(password)
+    clickTagWithValue(driver, "input", "Login")
+
+
+def enterRegisterationPage(driver, pin):
+    # Navigate to Registeration page and enter PIN.
+    driver.get("https://prod11gbss8.rose-hulman.edu/BanSS/bwskfreg.P_AltPin")
+    clickTagWithValue(driver, "input", "Submit")
+    driver.find_element_by_name("pin").send_keys(pin)
+    clickTagWithValue(driver, "input", "Submit")
+
+
+def attemptToRegisterate(driver, crnInput):
+    """
+        Gets the CRN text box and fills it in with crn numbers.
+
+        Arguments:
+            :type driver :    webdriver
+                Selenium Webdriver.
+            :type crnInput :  list
+                List of CRN numbers.
+
+        Returns a list of CRN text box.
+        Raises Selenium.NoSuchElementException
+    """
+    crnFields = []
+    identifier = 1
+
+    try:
+        while (len(crnFields) < len(crnInput)):
+            crnFields.append(driver.find_element_by_id(
+                "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
+            identifier += 1
+        clickTagWithValue(driver, "input", "Submit Changes")
+        return True
+    except(NoSuchElementException):
+        print("Page Not Ready.")
+        driver.refresh()
+        if (isinstance(driver, webdriver.Firefox)):
+            Alert(driver).accept()
+    return False
+
 
 def getData(dataFile):
     """
@@ -163,35 +184,15 @@ def clickTagWithValue(driver, tagName, value):
             break
 
 
-def attemptToRegisterate(driver, crnInput):
+def setup_directory():
     """
-        Gets the CRN text box and fills it in with crn numbers.
-
-        Arguments:
-            :type driver :    webdriver
-                Selenium Webdriver.
-            :type crnInput :  list
-                List of CRN numbers.
-
-        Returns a list of CRN text box.
-        Raises Selenium.NoSuchElementException
+        Creates the logs and img files if not created.
     """
-    crnFields = []
-    identifier = 1
-
-    try:
-        while (len(crnFields) < len(crnInput)):
-            crnFields.append(driver.find_element_by_id(
-                "crn_id" + str(identifier)).send_keys(crnInput[identifier - 1]))
-            identifier += 1
-        clickTagWithValue(driver, "input", "Submit Changes")
-        return True
-    except(NoSuchElementException):
-        print("Page Not Ready.")
-        driver.refresh()
-        if (isinstance(driver, webdriver.Firefox)):
-            Alert(driver).accept()
-    return False
+    # Make directory for logs and images if necessary.
+    if (not os.path.isdir("../logs/")):
+        os.makedirs("../logs/")
+    if (not os.path.isdir("../img/")):
+        os.makedirs("../img/")
 
 
 if __name__ == "__main__":
