@@ -45,8 +45,6 @@ def main():
     crnInput = dataMap["crn"]
 
     # Initialize boolean
-    isFirefox = False  # (Firefox has Alert(driver))
-    isPhantom = False
 
     # Initialize Webdriver.
     if (len(sys.argv) > 2):
@@ -54,12 +52,10 @@ def main():
             driver = webdriver.Chrome(
                 "../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
         elif (sys.argv[2].lower() == "phantom"):
-            isPhantom = True
             driver = webdriver.PhantomJS(
                 "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
         elif (sys.argv[2].lower() == "firefox"):
-            # Based on MDN. Import when only required to.
-            isFirefox = True
+            # Based on MDN. Import when only required to. (Firefox has Alert(driver))
             from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
             caps = DesiredCapabilities.FIREFOX
             caps["marionette"] = True
@@ -67,11 +63,9 @@ def main():
                 executable_path="../drivers/geckodriver.exe", capabilities=caps)
         else:
             print("Invalid option...using PhantomJS")
-            isPhantom = True
             driver = webdriver.PhantomJS(
                 "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
     else:
-        isPhantom = True
         driver = webdriver.PhantomJS(
             "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
 
@@ -106,11 +100,10 @@ def main():
         # Enter CRN info.
         try:
             crnFields = fillInCrn(driver, crnInput)
-            break
         except(NoSuchElementException):
             print("Page Not Ready.")
             driver.refresh()
-            if (isFirefox):
+            if (isinstance(driver, webdriver.Firefox)):
                 Alert(driver).accept()
 
     # Get potential submit buttons.
@@ -124,7 +117,7 @@ def main():
 
     # Take picture and close driver.
     driver.save_screenshot("../img/confirmation.jpg")
-    if (isPhantom):
+    if (isinstance(driver, webdriver.PhantomJS)):
         driver.close()
     else:
         print("Waiting For User to terminate (Ctrl-C)")
