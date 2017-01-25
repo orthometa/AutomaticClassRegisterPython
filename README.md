@@ -19,6 +19,7 @@ This has been tested during the Fall 2016-2017 registration period. I was able t
 # Installation:
   1. Before you run the script you need to install `Selenium for Python`
   2. Either download the zip folder of this repository or run 
+  
     ``$ git clone https://github.com/fredzqm/AutomaticClassRegisterPython.git``
   3. Navigate to the root of this project directory.
   4. In the root directory of the repos, run the following command: `pip install -r requirements.txt`
