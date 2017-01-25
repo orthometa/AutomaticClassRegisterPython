@@ -143,9 +143,7 @@ def attemptToRegisterate(driver, crnInput):
     """
     try:
         for identifier in range(1, len(crnInput)+1):
-            id = "crn_id" + str(identifier)
-            print(id)
-            element = driver.find_element_by_id(id)
+            element = driver.find_element_by_id("crn_id" + str(identifier))
             element.send_keys(crnInput[identifier - 1])
             identifier += 1
         clickTagWithValue(driver, "input", "Submit Changes")
