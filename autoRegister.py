@@ -30,8 +30,9 @@ attempt_time_key = "attempt_start"
 
 def main():
     # Ensure a data file path is given.
-    if (len(sys.argv) < 2):
+    if (len(sys.argv) < 3):
         print("AutoRegister.py <dataFile> <opt:browser>")
+        print("\tbrowser options: chrome phantom firefox")
         return
     setup_directory()
 
@@ -63,7 +64,7 @@ def AutoRegister(driver, dataMap):
     enterRegisterationPage(driver, dataMap[dataMapPin_Key])
 
     # Take picture of the waiting page
-    driver.save_screenshot("../img/waitPage.jpg")
+    driver.save_screenshot("./img/waitPage.jpg")
 
     startTime = datetime.strptime(dataMap[attempt_time_key][0], "%H:%M:%S-%m/%d/%Y")
 
@@ -87,27 +88,27 @@ def AutoRegister(driver, dataMap):
                 break;
 
     # Take picture and close driver.
-    driver.save_screenshot("../img/confirmation.jpg")
+    driver.save_screenshot("./img/confirmation.jpg")
     return True
 
 def getDriver(browser):
     if (browser == "chrome"):
         return webdriver.Chrome(
-            "../drivers/chromedriver.exe", service_log_path="../logs/chrome.log")
+            "./drivers/chromedriver.exe", service_log_path="./logs/chrome.log")
     elif (browser == "phantom"):
         return webdriver.PhantomJS(
-            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+            "./drivers/phantomjs.exe", service_log_path="./logs/phantom.log")
     elif (browser == "firefox"):
         # Based on MDN. Import when only required to. (Firefox has Alert(driver))
         from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
         caps = DesiredCapabilities.FIREFOX
         caps["marionette"] = True
         return webdriver.Firefox(
-            executable_path="../drivers/geckodriver.exe", capabilities=caps)
+            executable_path="./drivers/geckodriver.exe", capabilities=caps)
     else:
         print("Invalid option...using PhantomJS")
         return webdriver.PhantomJS(
-            "../drivers/phantomjs.exe", service_log_path="../logs/phantom.log")
+            "./drivers/phantomjs.exe", service_log_path="./logs/phantom.log")
 
 
 def login(driver, userName, password):
@@ -202,10 +203,10 @@ def setup_directory():
         Creates the logs and img files if not created.
     """
     # Make directory for logs and images if necessary.
-    if (not os.path.isdir("../logs/")):
-        os.makedirs("../logs/")
-    if (not os.path.isdir("../img/")):
-        os.makedirs("../img/")
+    if (not os.path.isdir("./logs/")):
+        os.makedirs("./logs/")
+    if (not os.path.isdir("./img/")):
+        os.makedirs("./img/")
 
 
 if __name__ == "__main__":
